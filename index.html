@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Media Showcase — Dual Backgrounds</title>
+  <style>
+    :root{
+      --bg:#000000;
+      --card:#0f0f10;
+      --accent:#e53935;
+      --muted:#9aa0a6;
+      --text:#f5f5f5;
+      --radius:12px;
+      --gap:18px;
+      --max-width:1100px;
+      --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--font-sans);
+      background:linear-gradient(180deg,var(--bg),#080808 140%);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.45;
+      padding-bottom:72px;
+    }
+
+    .container{max-width:var(--max-width);margin:0 auto;padding:24px}
+    .site-header{padding:28px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
+    .header-inner{display:flex;flex-direction:column;gap:8px}
+    .site-title{font-size:1.6rem;margin:0;color:var(--accent)}
+    .subtitle{margin:0;color:var(--muted);font-size:0.95rem}
+    .section{margin-top:20px}
+
+    .media-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gap);align-items:start;}
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding:18px;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.03);
+      box-shadow:0 8px 22px rgba(0,0,0,0.8);transition:transform 220ms ease, box-shadow 220ms ease;
+    }
+    .card-title{margin:0 0 6px 0;font-size:1.05rem;color:var(--accent)}
+    .card-title a{color:inherit;text-decoration:none}
+    .card-title a:hover{text-decoration:underline}
+    .card-desc{margin:0 0 12px 0;color:var(--muted);font-size:0.95rem}
+
+    .media-control{
+      width:100%;
+      max-height:420px;
+      border-radius:8px;
+      background:#000;
+      outline:1px solid rgba(255,255,255,0.03);
+    }
+
+    .yt-btn{
+      display:inline-block;margin-top:8px;padding:8px 12px;border-radius:8px;background:rgba(229,57,53,0.12);color:var(--accent);text-decoration:none;border:1px solid rgba(229,57,53,0.08);cursor:pointer;
+    }
+
+    .site-footer{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.6));padding:10px 0;text-align:center;border-top:1px solid rgba(255,255,255,0.03)}
+    .site-footer small{color:var(--muted)}
+
+    a:focus, button:focus, .media-control:focus{ outline:3px solid rgba(229,57,53,0.18); outline-offset:2px; }
+
+    @media (max-width:1000px){ .media-grid{grid-template-columns:repeat(2,1fr)} .site-title{font-size:1.4rem} }
+    @media (max-width:760px){
+      .media-grid{grid-template-columns:1fr}
+      .header-inner{align-items:flex-start}
+      .site-title{font-size:1.2rem}
+      .subtitle{font-size:0.9rem}
+      .container{padding:16px}
+      .media-control{max-height:320px}
+    }
+    @media (min-width:1400px){ :root{--max-width:1300px} .card{padding:20px} }
+
+    .card:hover{ transform:translateY(-6px); box-shadow:0 18px 42px rgba(0,0,0,0.65); }
+    @media (prefers-reduced-motion: reduce){ .card, .card:hover { transition: none; transform: none; } }
+    @media (prefers-reduced-transparency: reduce){ .card { backdrop-filter: none; } }
+
+    /* --- background video styles (shared) --- */
+    .bg-video-wrap{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      overflow:hidden;
+      pointer-events:none;
+      display:block;
+    }
+
+    /* visibility + opacity pairing for clearer state */
+    .bg-video{
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      min-width:100%;
+      min-height:100%;
+      width:auto;
+      height:auto;
+      object-fit:cover;
+      transform-origin:center;
+      will-change:opacity;
+      transition: opacity 600ms cubic-bezier(.2,.9,.2,1), visibility 0ms linear 600ms;
+      opacity:0;
+      visibility:hidden;
+    }
+    .bg-video--visible{
+      opacity:0.75;
+      visibility:visible;
+      transition-delay:0ms;
+    }
+
+    .bg-video-wrap[data-key="reze"]{ z-index:0; }
+    .bg-video-wrap[data-key="suk"]{ z-index:0; }
+
+    body > *:not(.bg-video-wrap){ position:relative; z-index:1; }
+
+    @media (prefers-reduced-motion: reduce){ .bg-video-wrap{ display:none; } }
+    @media (max-width:700px){ .bg-video-wrap{ display:none; } }
+  </style>
+</head>
+<body>
+  <!-- Background video for reze.mp4 (mapped to "In the Pool") -->
+  <div class="bg-video-wrap" data-key="reze" aria-hidden="true">
+    <video id="bg-reze" class="bg-video" playsinline muted loop preload="metadata" poster="media/reze-poster.jpg">
+      <source src="media/reze.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <!-- Background video for suk.mp4 (mapped to "Malevolent Shrine") -->
+  <div class="bg-video-wrap" data-key="suk" aria-hidden="true">
+    <video id="bg-suk" class="bg-video" playsinline muted loop preload="metadata" poster="media/suk-poster.jpg">
+      <source src="media/suk.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <h1 class="site-title">Media Showcase</h1>
+      <p class="subtitle">Two audio tracks · Two background videos · Play on YouTube</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="section media-grid" aria-label="Media items">
+      <!-- Reze audio card (In the Pool) -->
+      <article class="card" id="card-in-the-pool">
+        <h2 class="card-title">
+          <a href="https://youtu.be/gqbHP8eJaV4?si=iBIRQ2_SaGJK1v3b" target="_blank" rel="noopener">Audio — In the Pool</a>
+        </h2>
+        <p class="card-desc">Chainsaw Man Reze Arc OST — piano cover.</p>
+        <audio id="audio-in-the-pool" controls preload="metadata" class="media-control" aria-label="Play In the Pool audio">
+          <source src="media/Chainsaw-Man-Reze-Arc-In-The-Pool-Kensuke-Ushio.mp3" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+
+        <div>
+          <a class="yt-btn" href="https://www.youtube.com/watch?v=gqbHP8eJaV4" target="_blank" rel="noopener">Play on YouTube</a>
+        </div>
+      </article>
+
+      <!-- Suk audio card (Malevolent Shrine) -->
+      <article class="card" id="card-malevolent">
+        <h2 class="card-title">
+          <a href="https://www.youtube.com/watch?v=JnBMFJMYQcc" target="_blank" rel="noopener">Audio — Malevolent Shrine</a>
+        </h2>
+        <p class="card-desc">Yoshimasa Terui — Predalien piano cover.</p>
+        <audio id="audio-malevolent" controls preload="metadata" class="media-control" aria-label="Play Malevolent Shrine audio">
+          <source src="media/Yoshimasa%20Terui%20-%20Malevolent%20Shrine%20%28Predalien%20Piano%20Cover%29.mp3" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+
+        <div>
+          <a class="yt-btn" href="https://www.youtube.com/watch?v=JnBMFJMYQcc" target="_blank" rel="noopener">Play on YouTube</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="section links" aria-label="External links">
+      <p>External resources:</p>
+      <ul>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio" target="_blank" rel="noopener">HTML audio element docs</a></li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video" target="_blank" rel="noopener">HTML video element docs</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>Built with semantic HTML and responsive CSS</small>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      // Map audio element IDs to background video element IDs
+      const mapping = {
+        'audio-in-the-pool': 'bg-reze',
+        'audio-malevolent': 'bg-suk'
+      };
+
+      // DOM collections
+      const allAudios = Array.from(document.querySelectorAll('audio'));
+      const bgIds = Object.values(mapping);
+      const bgVideos = bgIds.map(id => document.getElementById(id)).filter(Boolean);
+
+      if (allAudios.length === 0) return;
+
+      // Reduced motion preference
+      const prefersReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Track transition handlers so we can remove them when needed
+      const transitionHandlers = new Map();
+
+      // Remove existing transitionend handler for a video
+      function removeTransitionHandler(video) {
+        const h = transitionHandlers.get(video.id);
+        if (h) {
+          try { video.removeEventListener('transitionend', h); } catch(e){}
+          transitionHandlers.delete(video.id);
+        }
+      }
+
+      // Attach transitionend handler: pause + reset after fade-out
+      function attachPauseAfterFade(video) {
+        removeTransitionHandler(video);
+        const handler = function onTransitionEnd(evt) {
+          if (evt.target !== video || evt.propertyName !== 'opacity') return;
+          try {
+            video.pause();
+            video.currentTime = 0;
+            video.style.visibility = 'hidden';
+          } catch (e) {}
+          transitionHandlers.delete(video.id);
+        };
+        transitionHandlers.set(video.id, handler);
+        video.addEventListener('transitionend', handler, { once: true });
+      }
+
+      // Show target background video and hide others
+      async function showBgForAudio(audioEl) {
+        if (prefersReduce) return;
+        const bgId = mapping[audioEl.id];
+
+        // Immediately cancel any pending handlers and start fade-out for non-targets
+        bgVideos.forEach(v => {
+          if (!bgId || v.id !== bgId) {
+            removeTransitionHandler(v);
+            v.classList.remove('bg-video--visible');
+            attachPauseAfterFade(v);
+          }
+        });
+
+        if (!bgId) return;
+        const target = document.getElementById(bgId);
+        if (!target) return;
+
+        // Cancel any pending fade handler for the target (we're about to show it)
+        removeTransitionHandler(target);
+
+        try { target.currentTime = 0; } catch (e) {}
+
+        // Ensure video is muted before attempting play to improve autoplay behavior
+        try { target.muted = true; } catch (e) {}
+
+        // Make visible for accessibility/interaction then trigger reflow and fade-in
+        target.style.visibility = 'visible';
+        void target.offsetHeight; // force reflow
+
+        try { await target.play(); } catch (e) { /* ignore autoplay blocks */ }
+
+        // Add visible class to start the opacity transition (fade-in)
+        target.classList.add('bg-video--visible');
+      }
+
+      // Hide all backgrounds (fade out, then pause + reset after transition)
+      function hideAllBg() {
+        bgVideos.forEach(v => {
+          removeTransitionHandler(v);
+          v.classList.remove('bg-video--visible');
+          attachPauseAfterFade(v);
+        });
+      }
+
+      // Enforce single-audio: when one audio plays, pause all others
+      allAudios.forEach(a => {
+        a.addEventListener('play', () => {
+          allAudios.forEach(other => {
+            if (other !== a && !other.paused) {
+              try { other.pause(); } catch(e){}
+            }
+          });
+
+          if (mapping[a.id]) {
+            showBgForAudio(a);
+          } else {
+            hideAllBg();
+          }
+        }, {passive:true});
+      });
+
+      // When mapped audios pause or end -> hide backgrounds
+      Object.keys(mapping).forEach(audioId => {
+        const a = document.getElementById(audioId);
+        if (!a) return;
+        a.addEventListener('pause', hideAllBg);
+        a.addEventListener('ended', hideAllBg);
+      });
+
+      // Initial sync: if a mapped audio already playing on load, show its bg
+      Object.keys(mapping).forEach(audioId => {
+        const a = document.getElementById(audioId);
+        if (a && !a.paused && !a.ended) showBgForAudio(a);
+      });
+
+      // Visibility: hide/pause backgrounds when tab hidden, restore if mapped audio playing on visible
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          hideAllBg();
+        } else {
+          const playingMapped = Object.keys(mapping).find(audioId => {
+            const a = document.getElementById(audioId);
+            return a && !a.paused && !a.ended;
+          });
+          if (playingMapped) {
+            const a = document.getElementById(playingMapped);
+            showBgForAudio(a);
+          }
+        }
+      });
+
+      // Note: inline iframe injection removed; Play on YouTube links open the watch page.
+    })();
+  </script>
+</body>
+</html>
+ 
